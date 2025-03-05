@@ -27,9 +27,9 @@
             <p class="card-text">
               Nhà xuất bản: {{ book.MaNXB?.TenNXB || 'Không xác định' }}
             </p>
-            <p class="card-text">Đơn giá: {{ book.DonGia }}đ</p>
+            <p class="card-text">Đơn giá: {{ formatCurrency(book.DonGia) }}</p>
             <p class="card-text">Số quyển: {{ book.SoQuyen }}</p>
-            <p class="card-text" v-if="borrowStatus[book.MaSach]">
+            <p class="card-text">
               <span class="badge" :class="getStatusBadgeClass(book.MaSach)">
                 {{ getStatusText(book.MaSach) }}
               </span>
@@ -39,9 +39,9 @@
             <button 
               class="btn btn-primary w-100" 
               @click="requestBorrow(book.MaSach)"
-              :disabled="borrowStatus[book.MaSach] === 'unavailable' || borrowStatus[book.MaSach] === 'pending'"
+              :disabled="borrowStatus[book.MaSach] === 'đang mượn' || borrowStatus[book.MaSach] === 'chờ duyệt'"
             >
-              {{ getButtonText(book.MaSach) }}
+              Yêu cầu mượn sách
             </button>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default {
     async loadBookStatus() {
       try {
         const [borrowing, pending] = await Promise.all([
-          api.getBorrowingBooks(),
+          api.getMyBorrowingBooks(),
           api.getMyPendingRequests()
         ]);
 
@@ -99,31 +99,20 @@ export default {
     getStatusBadgeClass(maSach) {
       const status = this.borrowStatus[maSach];
       return {
-        'bg-warning': status === 'pending',
-        'bg-danger': status === 'unavailable',
+        'bg-warning': status === 'chờ duyệt',
+        'bg-danger': status === 'đang mượn',
         'bg-success': !status
       };
     },
     getStatusText(maSach) {
       const status = this.borrowStatus[maSach];
       switch (status) {
-        case 'unavailable':
-          return 'Đã có người mượn';
-        case 'pending':
+        case 'đang mượn':
+          return 'Bạn đã mượn quyển sách này';
+        case 'chờ duyệt':
           return 'Đang chờ duyệt';
         default:
           return 'Có thể mượn';
-      }
-    },
-    getButtonText(maSach) {
-      const status = this.borrowStatus[maSach];
-      switch (status) {
-        case 'unavailable':
-          return 'Đã có người mượn';
-        case 'pending':
-          return 'Đang chờ duyệt';
-        default:
-          return 'Yêu cầu mượn sách';
       }
     },
     async requestBorrow(maSach) {
@@ -147,6 +136,12 @@ export default {
       } else {
         await this.loadBooks();
       }
+    },
+    formatCurrency(value) {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+      }).format(value);
     }
   }
 };

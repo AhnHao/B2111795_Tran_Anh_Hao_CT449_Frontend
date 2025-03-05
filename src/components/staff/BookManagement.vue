@@ -43,7 +43,7 @@
             <td>{{ book.MaSach }}</td>
             <td>{{ book.TenSach }}</td>
             <td>{{ book.MaNXB?.TenNXB || 'Không xác định' }}</td>
-            <td>{{ book.DonGia }}</td>
+            <td>{{ formatCurrency(book.DonGia) }}</td>
             <td>{{ book.SoQuyen }}</td>
             <td>
               <button class="btn btn-sm btn-warning me-2" @click="showEditModal(book)">
@@ -252,6 +252,12 @@ export default {
       } else {
         await this.loadBooks();
       }
+    },
+    formatCurrency(value) {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+      }).format(value);
     }
   }
 };
