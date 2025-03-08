@@ -7,6 +7,24 @@
       </button>
     </div>
 
+    <!-- Thanh tìm kiếm -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Tìm kiếm nhà xuất bản..."
+            v-model="searchKeyword"
+            @input="handleSearch"
+          />
+          <button class="btn btn-outline-secondary" type="button">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Bảng danh sách -->
     <div class="table-responsive">
       <table class="table table-striped">
@@ -24,10 +42,16 @@
             <td>{{ publisher.TenNXB }}</td>
             <td>{{ publisher.DiaChi }}</td>
             <td>
-              <button class="btn btn-sm btn-warning me-2" @click="showEditModal(publisher)">
+              <button
+                class="btn btn-sm btn-warning me-2"
+                @click="showEditModal(publisher)"
+              >
                 <i class="bi bi-pencil"></i>
               </button>
-              <button class="btn btn-sm btn-danger" @click="confirmDelete(publisher)">
+              <button
+                class="btn btn-sm btn-danger"
+                @click="confirmDelete(publisher)"
+              >
                 <i class="bi bi-trash"></i>
               </button>
             </td>
@@ -41,24 +65,49 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ isEditing ? 'Sửa nhà xuất bản' : 'Thêm nhà xuất bản' }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <h5 class="modal-title">
+              {{ isEditing ? "Sửa nhà xuất bản" : "Thêm nhà xuất bản" }}
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="handleSubmit">
               <div class="mb-3">
                 <label class="form-label">Tên nhà xuất bản</label>
-                <input type="text" class="form-control" v-model="formData.TenNXB" required>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="formData.TenNXB"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Địa chỉ</label>
-                <input type="text" class="form-control" v-model="formData.DiaChi">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="formData.DiaChi"
+                />
               </div>
               <div class="alert alert-danger" v-if="error">{{ error }}</div>
               <div class="text-end">
-                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Hủy</button>
-                <button type="submit" class="btn btn-primary" :disabled="loading">
-                  {{ loading ? 'Đang xử lý...' : 'Lưu' }}
+                <button
+                  type="button"
+                  class="btn btn-secondary me-2"
+                  data-bs-dismiss="modal"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  :disabled="loading"
+                >
+                  {{ loading ? "Đang xử lý..." : "Lưu" }}
                 </button>
               </div>
             </form>
@@ -73,15 +122,30 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Xác nhận xóa</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body">
             Bạn có chắc chắn muốn xóa nhà xuất bản này?
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-            <button type="button" class="btn btn-danger" @click="handleDelete" :disabled="loading">
-              {{ loading ? 'Đang xử lý...' : 'Xóa' }}
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              @click="handleDelete"
+              :disabled="loading"
+            >
+              {{ loading ? "Đang xử lý..." : "Xóa" }}
             </button>
           </div>
         </div>
@@ -91,30 +155,31 @@
 </template>
 
 <script>
-import { Modal } from 'bootstrap';
-import api from '../../services/api';
+import { Modal } from "bootstrap";
+import api from "../../services/api";
 
 export default {
-  name: 'PublisherManagement',
+  name: "PublisherManagement",
   data() {
     return {
       publishers: [],
+      searchKeyword: "",
       formData: {
-        TenNXB: '',
-        DiaChi: ''
+        TenNXB: "",
+        DiaChi: "",
       },
       selectedPublisher: null,
       isEditing: false,
       loading: false,
       error: null,
       publisherModal: null,
-      deleteModal: null
+      deleteModal: null,
     };
   },
   async mounted() {
     await this.loadPublishers();
-    this.publisherModal = new Modal(document.getElementById('publisherModal'));
-    this.deleteModal = new Modal(document.getElementById('deleteModal'));
+    this.publisherModal = new Modal(document.getElementById("publisherModal"));
+    this.deleteModal = new Modal(document.getElementById("deleteModal"));
   },
   methods: {
     async loadPublishers() {
@@ -122,12 +187,24 @@ export default {
         const response = await api.getAllPublishers();
         this.publishers = response.data;
       } catch (error) {
-        console.error('Lỗi khi tải danh sách nhà xuất bản:', error);
+        console.error("Lỗi khi tải danh sách nhà xuất bản:", error);
+      }
+    },
+    async handleSearch() {
+      if (this.searchKeyword.trim()) {
+        try {
+          const response = await api.searchPublishers(this.searchKeyword);
+          this.publishers = response.data;
+        } catch (error) {
+          console.error("Lỗi khi tìm kiếm nhà xuất bản:", error);
+        }
+      } else {
+        await this.loadPublishers();
       }
     },
     showAddModal() {
       this.isEditing = false;
-      this.formData = { TenNXB: '', DiaChi: '' };
+      this.formData = { TenNXB: "", DiaChi: "" };
       this.error = null;
       this.publisherModal.show();
     },
@@ -150,7 +227,7 @@ export default {
         await this.loadPublishers();
         this.publisherModal.hide();
       } catch (error) {
-        this.error = error.response?.data?.message || 'Đã có lỗi xảy ra';
+        this.error = error.response?.data?.message || "Đã có lỗi xảy ra";
       } finally {
         this.loading = false;
       }
@@ -166,11 +243,11 @@ export default {
         await this.loadPublishers();
         this.deleteModal.hide();
       } catch (error) {
-        alert(error.response?.data?.message || 'Đã có lỗi xảy ra');
+        alert(error.response?.data?.message || "Đã có lỗi xảy ra");
       } finally {
         this.loading = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>

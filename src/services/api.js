@@ -55,6 +55,9 @@ export default {
   deletePublisher(id) {
     return api.delete(`/publisher/${id}`);
   },
+  searchPublishers(keyword) {
+    return api.get(`/publishers/search?keyword=${keyword}`);
+  },
 
   // Book APIs
   getAllBooks() {
