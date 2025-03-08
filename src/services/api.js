@@ -1,16 +1,16 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: "http://localhost:3000/api",
   headers: {
-    'Content-Type': 'application/json'
-  }
+    "Content-Type": "application/json",
+  },
 });
 
 // Thêm interceptor để tự động gắn token vào header
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -26,8 +26,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
@@ -36,18 +36,18 @@ api.interceptors.response.use(
 export default {
   // Auth APIs
   login(credentials) {
-    return api.post('/auth/login', credentials);
+    return api.post("/auth/login", credentials);
   },
   register(userData) {
-    return api.post('/auth/register', userData);
+    return api.post("/auth/register", userData);
   },
 
   // Publisher APIs
   getAllPublishers() {
-    return api.get('/publisher');
+    return api.get("/publisher");
   },
   createPublisher(data) {
-    return api.post('/publisher', data);
+    return api.post("/publisher", data);
   },
   updatePublisher(id, data) {
     return api.put(`/publisher/${id}`, data);
@@ -58,17 +58,17 @@ export default {
 
   // Book APIs
   getAllBooks() {
-    return api.get('/books');
+    return api.get("/books");
   },
   createBook(data) {
-    return api.post('/books', data).catch(error => {
-      console.error('Error creating book:', error.response?.data);
+    return api.post("/books", data).catch((error) => {
+      console.error("Error creating book:", error.response?.data);
       throw error;
     });
   },
   updateBook(id, data) {
-    return api.put(`/books/${id}`, data).catch(error => {
-      console.error('Error updating book:', error.response?.data);
+    return api.put(`/books/${id}`, data).catch((error) => {
+      console.error("Error updating book:", error.response?.data);
       throw error;
     });
   },
@@ -95,73 +95,58 @@ export default {
 
   // Staff borrowing management APIs
   getPendingRequests() {
-    return api.get('/borrow-requests/pending');
+    return api.get("/borrow-requests/pending");
   },
   getCurrentBorrowings() {
-    return api.get('/borrowing/current');
+    return api.get("/borrowing/current");
   },
   approveRequest(requestId) {
     return api.post(`/borrow-requests/${requestId}/approve`);
   },
 
+  getAllBorrowingHistory() {
+    return api.get("/borrow-requests/all-history");
+  },
+
   // Reader borrowing APIs
   requestBorrow(maSach) {
-    return api.post('/borrow-requests/request', { MaSach: maSach });
+    return api.post("/borrow-requests/request", { MaSach: maSach });
   },
   getBorrowedBooks() {
-    return api.get('/borrowing/borrowed');
+    return api.get("/borrowing/borrowed");
   },
   getBorrowingHistory() {
-    return api.get('/borrowing/history');
+    return api.get("/borrowing/history");
   },
 
   // Thêm API mới
   getBookStatus() {
-    return api.get('/borrow-requests/book-status');
+    return api.get("/borrow-requests/book-status");
   },
 
   // API cho quản lý yêu cầu mượn sách
   getBookById(maSach) {
     return api.get(`/books/${maSach}`);
   },
-  
+
   rejectRequest(requestId) {
     return api.post(`/borrow-requests/${requestId}/reject`);
   },
 
-  // APIs cho quản lý mượn sách
-  getBorrowingBooks() {
-    return api.get('/borrow-requests/my-borrowing');
-  },
-  
-  getBorrowingHistory() {
-    return api.get('/borrow-requests/my-history');
-  },
-  
-  getMyPendingRequests() {
-    return api.get('/borrow-requests/my-pending');
-  },
-
-  // API cho staff
-  returnBook(requestId) {
-    return api.post(`/borrow-requests/${requestId}/return`);
-  },
-
-  // API cho độc giả
+  // // API cho độc giả
   getMyBorrowingBooks() {
-    return api.get('/borrow-requests/my-borrowing');
-  },
-  
-  getMyBorrowingHistory() {
-    return api.get('/borrow-requests/my-history');
-  },
-  
-  getMyPendingRequests() {
-    return api.get('/borrow-requests/my-pending');
+    return api.get("/borrow-requests/my-borrowing");
   },
 
-  // API cho staff
+  getMyBorrowingHistory() {
+    return api.get("/borrow-requests/my-history");
+  },
+
+  getMyPendingRequests() {
+    return api.get("/borrow-requests/my-pending");
+  },
+
   returnBook(requestId) {
     return api.post(`/borrow-requests/${requestId}/return`);
-  }
+  },
 };

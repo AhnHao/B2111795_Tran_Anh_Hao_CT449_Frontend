@@ -4,13 +4,13 @@
     <div class="row mb-4">
       <div class="col-md-6">
         <div class="input-group">
-          <input 
-            type="text" 
-            class="form-control" 
-            placeholder="Tìm kiếm sách..." 
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Tìm kiếm sách..."
             v-model="searchKeyword"
             @input="handleSearch"
-          >
+          />
         </div>
       </div>
     </div>
@@ -25,21 +25,24 @@
               <small class="text-muted">Mã sách: {{ book.MaSach }}</small>
             </p>
             <p class="card-text">
-              Nhà xuất bản: {{ book.MaNXB?.TenNXB || 'Không xác định' }}
+              Nhà xuất bản: {{ book.MaNXB?.TenNXB || "Không xác định" }}
             </p>
             <p class="card-text">Đơn giá: {{ formatCurrency(book.DonGia) }}</p>
             <p class="card-text">Số quyển: {{ book.SoQuyen }}</p>
             <p class="card-text">
-              <span class="badge" :class="getStatusBadgeClass(book.MaSach)">
-                {{ getStatusText(book.MaSach) }}
+              <span class="badge" :class="getStatusBadgeClass(book._id)">
+                {{ getStatusText(book._id) }}
               </span>
             </p>
           </div>
           <div class="card-footer">
-            <button 
-              class="btn btn-primary w-100" 
+            <button
+              class="btn btn-primary w-100"
               @click="requestBorrow(book.MaSach)"
-              :disabled="borrowStatus[book.MaSach] === 'đang mượn' || borrowStatus[book.MaSach] === 'chờ duyệt'"
+              :disabled="
+                borrowStatus[book._id] === 'đang mượn' ||
+                borrowStatus[book._id] === 'chờ duyệt'
+              "
             >
               Yêu cầu mượn sách
             </button>
@@ -51,15 +54,15 @@
 </template>
 
 <script>
-import api from '../../services/api';
+import api from "../../services/api";
 
 export default {
-  name: 'BookList',
+  name: "BookList",
   data() {
     return {
       books: [],
-      searchKeyword: '',
-      borrowStatus: {}
+      searchKeyword: "",
+      borrowStatus: {},
     };
   },
   async mounted() {
@@ -72,57 +75,60 @@ export default {
         const response = await api.getAllBooks();
         this.books = response.data;
       } catch (error) {
-        console.error('Lỗi khi tải danh sách sách:', error);
-        alert('Không thể tải danh sách sách');
+        console.error("Lỗi khi tải danh sách sách:", error);
+        alert("Không thể tải danh sách sách");
       }
     },
     async loadBookStatus() {
       try {
         const [borrowing, pending] = await Promise.all([
           api.getMyBorrowingBooks(),
-          api.getMyPendingRequests()
+          api.getMyPendingRequests(),
         ]);
 
         const status = {};
-        borrowing.data.forEach(book => {
-          status[book.MaSach] = 'đang mượn';
+        borrowing.data.forEach((request) => {
+          status[request.MaSach._id] = "đang mượn";
         });
-        pending.data.forEach(book => {
-          status[book.MaSach] = 'chờ duyệt';
+        pending.data.forEach((request) => {
+          status[request.MaSach._id] = "chờ duyệt";
         });
 
         this.borrowStatus = status;
       } catch (error) {
-        console.error('Lỗi khi tải trạng thái sách:', error);
+        console.error("Lỗi khi tải trạng thái sách:", error);
       }
     },
-    getStatusBadgeClass(maSach) {
-      const status = this.borrowStatus[maSach];
+    getStatusBadgeClass(bookId) {
+      const status = this.borrowStatus[bookId];
       return {
-        'bg-warning': status === 'chờ duyệt',
-        'bg-danger': status === 'đang mượn',
-        'bg-success': !status
+        "bg-warning": status === "chờ duyệt",
+        "bg-danger": status === "đang mượn",
+        "bg-success": !status,
       };
     },
-    getStatusText(maSach) {
-      const status = this.borrowStatus[maSach];
+    getStatusText(bookId) {
+      const status = this.borrowStatus[bookId];
       switch (status) {
-        case 'đang mượn':
-          return 'Bạn đã mượn quyển sách này';
-        case 'chờ duyệt':
-          return 'Đang chờ duyệt';
+        case "đang mượn":
+          return "Bạn đã mượn quyển sách này";
+        case "chờ duyệt":
+          return "Đang chờ duyệt";
         default:
-          return 'Có thể mượn';
+          return "Có thể mượn";
       }
     },
     async requestBorrow(maSach) {
       try {
         const response = await api.requestBorrow(maSach);
-        alert('Đã gửi yêu cầu mượn sách thành công');
+        alert("Đã gửi yêu cầu mượn sách thành công");
         await this.loadBookStatus();
       } catch (error) {
-        console.error('Lỗi khi gửi yêu cầu mượn:', error);
-        alert(error.response?.data?.message || 'Đã có lỗi xảy ra khi gửi yêu cầu mượn');
+        console.error("Lỗi khi gửi yêu cầu mượn:", error);
+        alert(
+          error.response?.data?.message ||
+            "Đã có lỗi xảy ra khi gửi yêu cầu mượn"
+        );
       }
     },
     async handleSearch() {
@@ -131,19 +137,19 @@ export default {
           const response = await api.searchBooks(this.searchKeyword);
           this.books = response.data;
         } catch (error) {
-          console.error('Lỗi khi tìm kiếm sách:', error);
+          console.error("Lỗi khi tìm kiếm sách:", error);
         }
       } else {
         await this.loadBooks();
       }
     },
     formatCurrency(value) {
-      return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
+      return new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
       }).format(value);
-    }
-  }
+    },
+  },
 };
 </script>
 

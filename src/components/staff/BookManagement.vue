@@ -11,13 +11,13 @@
     <div class="row mb-4">
       <div class="col-md-6">
         <div class="input-group">
-          <input 
-            type="text" 
-            class="form-control" 
-            placeholder="Tìm kiếm sách..." 
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Tìm kiếm sách..."
             v-model="searchKeyword"
             @input="handleSearch"
-          >
+          />
           <button class="btn btn-outline-secondary" type="button">
             <i class="bi bi-search"></i>
           </button>
@@ -32,6 +32,7 @@
           <tr>
             <th>Mã sách</th>
             <th>Tên sách</th>
+            <th>Tác giả</th>
             <th>Nhà xuất bản</th>
             <th>Đơn giá</th>
             <th>Số quyển</th>
@@ -42,14 +43,21 @@
           <tr v-for="book in books" :key="book._id">
             <td>{{ book.MaSach }}</td>
             <td>{{ book.TenSach }}</td>
-            <td>{{ book.MaNXB?.TenNXB || 'Không xác định' }}</td>
+            <td>{{ book.TacGia }}</td>
+            <td>{{ book.MaNXB?.TenNXB || "Không xác định" }}</td>
             <td>{{ formatCurrency(book.DonGia) }}</td>
             <td>{{ book.SoQuyen }}</td>
             <td>
-              <button class="btn btn-sm btn-warning me-2" @click="showEditModal(book)">
+              <button
+                class="btn btn-sm btn-warning me-2"
+                @click="showEditModal(book)"
+              >
                 <i class="bi bi-pencil"></i>
               </button>
-              <button class="btn btn-sm btn-danger" @click="confirmDelete(book)">
+              <button
+                class="btn btn-sm btn-danger"
+                @click="confirmDelete(book)"
+              >
                 <i class="bi bi-trash"></i>
               </button>
             </td>
@@ -63,37 +71,81 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ isEditing ? 'Sửa sách' : 'Thêm sách' }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <h5 class="modal-title">
+              {{ isEditing ? "Sửa sách" : "Thêm sách" }}
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="handleSubmit">
               <div class="mb-3">
                 <label class="form-label">Tên sách</label>
-                <input type="text" class="form-control" v-model="formData.TenSach" required>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="formData.TenSach"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Tác giả</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="formData.TacGia"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Nhà xuất bản</label>
                 <select class="form-select" v-model="formData.MaNXB" required>
                   <option value="">Chọn nhà xuất bản</option>
-                  <option v-for="pub in publishers" :key="pub._id" :value="pub.MaNXB">
+                  <option
+                    v-for="pub in publishers"
+                    :key="pub._id"
+                    :value="pub.MaNXB"
+                  >
                     {{ pub.TenNXB }}
                   </option>
                 </select>
               </div>
               <div class="mb-3">
                 <label class="form-label">Đơn giá</label>
-                <input type="number" class="form-control" v-model="formData.DonGia" required>
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model="formData.DonGia"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Số quyển</label>
-                <input type="number" class="form-control" v-model="formData.SoQuyen" required>
+                <input
+                  type="number"
+                  class="form-control"
+                  v-model="formData.SoQuyen"
+                  required
+                />
               </div>
               <div class="alert alert-danger" v-if="error">{{ error }}</div>
               <div class="text-end">
-                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Hủy</button>
-                <button type="submit" class="btn btn-primary" :disabled="loading">
-                  {{ loading ? 'Đang xử lý...' : 'Lưu' }}
+                <button
+                  type="button"
+                  class="btn btn-secondary me-2"
+                  data-bs-dismiss="modal"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  :disabled="loading"
+                >
+                  {{ loading ? "Đang xử lý..." : "Lưu" }}
                 </button>
               </div>
             </form>
@@ -108,15 +160,28 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Xác nhận xóa</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
-          <div class="modal-body">
-            Bạn có chắc chắn muốn xóa sách này?
-          </div>
+          <div class="modal-body">Bạn có chắc chắn muốn xóa sách này?</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-            <button type="button" class="btn btn-danger" @click="handleDelete" :disabled="loading">
-              {{ loading ? 'Đang xử lý...' : 'Xóa' }}
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              @click="handleDelete"
+              :disabled="loading"
+            >
+              {{ loading ? "Đang xử lý..." : "Xóa" }}
             </button>
           </div>
         </div>
@@ -126,20 +191,21 @@
 </template>
 
 <script>
-import { Modal } from 'bootstrap';
-import api from '../../services/api';
+import { Modal } from "bootstrap";
+import api from "../../services/api";
 
 export default {
-  name: 'BookManagement',
+  name: "BookManagement",
   data() {
     return {
       books: [],
       publishers: [],
       formData: {
-        TenSach: '',
-        MaNXB: '',
-        DonGia: '',
-        SoQuyen: ''
+        TenSach: "",
+        TacGia: "",
+        MaNXB: "",
+        DonGia: "",
+        SoQuyen: "",
       },
       selectedBook: null,
       isEditing: false,
@@ -147,43 +213,41 @@ export default {
       error: null,
       bookModal: null,
       deleteModal: null,
-      searchKeyword: ''
+      searchKeyword: "",
     };
   },
   async mounted() {
-    await Promise.all([
-      this.loadBooks(),
-      this.loadPublishers()
-    ]);
-    this.bookModal = new Modal(document.getElementById('bookModal'));
-    this.deleteModal = new Modal(document.getElementById('deleteModal'));
+    await Promise.all([this.loadBooks(), this.loadPublishers()]);
+    this.bookModal = new Modal(document.getElementById("bookModal"));
+    this.deleteModal = new Modal(document.getElementById("deleteModal"));
   },
   methods: {
     async loadBooks() {
       try {
         const response = await api.getAllBooks();
-        console.log('Books loaded:', response.data);
+        console.log("Books loaded:", response.data);
         this.books = response.data;
       } catch (error) {
-        console.error('Lỗi khi tải danh sách sách:', error);
+        console.error("Lỗi khi tải danh sách sách:", error);
       }
     },
     async loadPublishers() {
       try {
         const response = await api.getAllPublishers();
-        console.log('Publishers loaded:', response.data);
+        console.log("Publishers loaded:", response.data);
         this.publishers = response.data;
       } catch (error) {
-        console.error('Lỗi khi tải danh sách nhà xuất bản:', error);
+        console.error("Lỗi khi tải danh sách nhà xuất bản:", error);
       }
     },
     showAddModal() {
       this.isEditing = false;
       this.formData = {
-        TenSach: '',
-        MaNXB: '',
-        DonGia: '',
-        SoQuyen: ''
+        TenSach: "",
+        TacGia: "",
+        MaNXB: "",
+        DonGia: "",
+        SoQuyen: "",
       };
       this.error = null;
       this.bookModal.show();
@@ -193,9 +257,10 @@ export default {
       this.selectedBook = book;
       this.formData = {
         TenSach: book.TenSach,
-        MaNXB: book.MaNXB?._id || '',
+        TacGia: book.TacGia,
+        MaNXB: book.MaNXB?._id || "",
         DonGia: book.DonGia,
-        SoQuyen: book.SoQuyen
+        SoQuyen: book.SoQuyen,
       };
       this.error = null;
       this.bookModal.show();
@@ -207,9 +272,9 @@ export default {
         const bookData = {
           ...this.formData,
           DonGia: Number(this.formData.DonGia),
-          SoQuyen: Number(this.formData.SoQuyen)
+          SoQuyen: Number(this.formData.SoQuyen),
         };
-        console.log('Submitting book data:', bookData);
+        console.log("Submitting book data:", bookData);
 
         if (this.isEditing) {
           await api.updateBook(this.selectedBook._id, bookData);
@@ -219,8 +284,8 @@ export default {
         await this.loadBooks();
         this.bookModal.hide();
       } catch (error) {
-        console.error('Error submitting book:', error);
-        this.error = error.response?.data?.message || 'Đã có lỗi xảy ra';
+        console.error("Error submitting book:", error);
+        this.error = error.response?.data?.message || "Đã có lỗi xảy ra";
       } finally {
         this.loading = false;
       }
@@ -236,7 +301,7 @@ export default {
         await this.loadBooks();
         this.deleteModal.hide();
       } catch (error) {
-        alert(error.response?.data?.message || 'Đã có lỗi xảy ra');
+        alert(error.response?.data?.message || "Đã có lỗi xảy ra");
       } finally {
         this.loading = false;
       }
@@ -247,18 +312,18 @@ export default {
           const response = await api.searchBooks(this.searchKeyword);
           this.books = response.data;
         } catch (error) {
-          console.error('Lỗi khi tìm kiếm sách:', error);
+          console.error("Lỗi khi tìm kiếm sách:", error);
         }
       } else {
         await this.loadBooks();
       }
     },
     formatCurrency(value) {
-      return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
+      return new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
       }).format(value);
-    }
-  }
+    },
+  },
 };
 </script>

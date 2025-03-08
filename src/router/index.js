@@ -3,6 +3,7 @@ import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 import ReaderDashboard from '../views/ReaderDashboard.vue';
 import StaffDashboard from '../views/StaffDashboard.vue';
+// import BorrowTracking from '../components/staff/BorrowTracking.vue';
 
 const routes = [
   {
@@ -30,7 +31,13 @@ const routes = [
     name: 'StaffDashboard',
     component: StaffDashboard,
     meta: { requiresAuth: true, role: 'staff' }
-  }
+  },
+  // {
+  //   path: '/staff/borrow-tracking',
+  //   name: 'BorrowTracking',
+  //   component: BorrowTracking,
+  //   meta: { requiresAuth: true, requiresStaff: true }
+  // }
 ];
 
 const router = createRouter({

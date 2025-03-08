@@ -7,17 +7,32 @@
     <!-- Tab Navigation -->
     <ul class="nav nav-tabs mb-4">
       <li class="nav-item">
-        <a class="nav-link" :class="{ active: activeTab === 'borrowing' }" @click="switchTab('borrowing')" href="#">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'borrowing' }"
+          @click="switchTab('borrowing')"
+          href="#"
+        >
           Đang mượn
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" :class="{ active: activeTab === 'history' }" @click="switchTab('history')" href="#">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'history' }"
+          @click="switchTab('history')"
+          href="#"
+        >
           Lịch sử mượn
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" :class="{ active: activeTab === 'pending' }" @click="switchTab('pending')" href="#">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'pending' }"
+          @click="switchTab('pending')"
+          href="#"
+        >
           Yêu cầu chờ duyệt
         </a>
       </li>
@@ -38,15 +53,18 @@
         </thead>
         <tbody>
           <tr v-for="book in borrowingBooks" :key="book._id">
-            <td>{{ book.TenSach }}</td>
-            <td>{{ book.MaSach }}</td>
+            <td>{{ book.MaSach?.TenSach }}</td>
+            <td>{{ book.MaSach?.MaSach }}</td>
             <td>{{ formatDate(book.NgayMuon) }}</td>
             <td>{{ formatDate(book.NgayHenTra) }}</td>
             <td>
               <span class="badge bg-primary">Đang mượn</span>
             </td>
             <td>
-              <button class="btn btn-success btn-sm" @click="returnBook(book._id)">
+              <button
+                class="btn btn-success btn-sm"
+                @click="returnBook(book._id)"
+              >
                 Trả sách
               </button>
             </td>
@@ -72,8 +90,8 @@
         </thead>
         <tbody>
           <tr v-for="book in historyBooks" :key="book._id">
-            <td>{{ book.TenSach }}</td>
-            <td>{{ book.MaSach }}</td>
+            <td>{{ book.MaSach?.TenSach }}</td>
+            <td>{{ book.MaSach?.MaSach }}</td>
             <td>{{ formatDate(book.NgayMuon) }}</td>
             <td>{{ formatDate(book.NgayTra) }}</td>
             <td>
@@ -102,8 +120,8 @@
         </thead>
         <tbody>
           <tr v-for="request in pendingRequests" :key="request._id">
-            <td>{{ request.TenSach }}</td>
-            <td>{{ request.MaSach }}</td>
+            <td>{{ request.MaSach?.TenSach }}</td>
+            <td>{{ request.MaSach?.MaSach }}</td>
             <td>{{ formatDate(request.NgayYeuCau) }}</td>
             <td>
               <span class="badge bg-warning">Chờ duyệt</span>
@@ -119,16 +137,16 @@
 </template>
 
 <script>
-import api from '../../services/api';
+import api from "../../services/api";
 
 export default {
-  name: 'BorrowingList',
+  name: "BorrowingList",
   data() {
     return {
-      activeTab: 'borrowing',
+      activeTab: "borrowing",
       borrowingBooks: [],
       historyBooks: [],
-      pendingRequests: []
+      pendingRequests: [],
     };
   },
   async mounted() {
@@ -142,47 +160,47 @@ export default {
     async loadData() {
       try {
         switch (this.activeTab) {
-          case 'borrowing':
+          case "borrowing":
             const borrowingResponse = await api.getMyBorrowingBooks();
             this.borrowingBooks = borrowingResponse.data;
             break;
-          case 'history':
+          case "history":
             const historyResponse = await api.getMyBorrowingHistory();
             this.historyBooks = historyResponse.data;
             break;
-          case 'pending':
+          case "pending":
             const pendingResponse = await api.getMyPendingRequests();
             this.pendingRequests = pendingResponse.data;
             break;
         }
       } catch (error) {
-        console.error('Lỗi khi tải dữ liệu:', error);
-        alert('Không thể tải dữ liệu');
+        console.error("Lỗi khi tải dữ liệu:", error);
+        alert("Không thể tải dữ liệu");
       }
     },
     formatDate(date) {
-      if (!date) return '';
-      return new Date(date).toLocaleDateString('vi-VN');
+      if (!date) return "";
+      return new Date(date).toLocaleDateString("vi-VN");
     },
     getStatusBadgeClass(status) {
       return {
-        'bg-success': status === 'đã trả',
-        'bg-danger': status === 'từ chối',
-        'bg-warning': status === 'chờ duyệt',
-        'bg-primary': status === 'đã duyệt'
+        "bg-success": status === "đã trả",
+        "bg-danger": status === "từ chối",
+        "bg-warning": status === "chờ duyệt",
+        "bg-primary": status === "đã duyệt",
       };
     },
     async returnBook(requestId) {
       try {
         await api.returnBook(requestId);
-        alert('Đã trả sách thành công');
+        alert("Đã trả sách thành công");
         await this.loadData();
       } catch (error) {
-        console.error('Lỗi khi trả sách:', error);
-        alert(error.response?.data?.message || 'Không thể trả sách');
+        console.error("Lỗi khi trả sách:", error);
+        alert(error.response?.data?.message || "Không thể trả sách");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -193,4 +211,4 @@ export default {
 .badge {
   padding: 0.5em 1em;
 }
-</style> 
+</style>
