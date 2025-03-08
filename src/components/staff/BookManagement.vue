@@ -34,6 +34,7 @@
             <th>Tên sách</th>
             <th>Tác giả</th>
             <th>Nhà xuất bản</th>
+            <th>Năm xuất bản</th>
             <th>Đơn giá</th>
             <th>Số quyển</th>
             <th>Thao tác</th>
@@ -45,6 +46,7 @@
             <td>{{ book.TenSach }}</td>
             <td>{{ book.TacGia }}</td>
             <td>{{ book.MaNXB?.TenNXB || "Không xác định" }}</td>
+            <td>{{ book.NamXB }}</td>
             <td>{{ formatCurrency(book.DonGia) }}</td>
             <td>{{ book.SoQuyen }}</td>
             <td>
@@ -112,6 +114,15 @@
                     {{ pub.TenNXB }}
                   </option>
                 </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Năm xuất bản</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="formData.NamXB"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Đơn giá</label>
@@ -204,6 +215,7 @@ export default {
         TenSach: "",
         TacGia: "",
         MaNXB: "",
+        NamXB: "",
         DonGia: "",
         SoQuyen: "",
       },
@@ -246,6 +258,7 @@ export default {
         TenSach: "",
         TacGia: "",
         MaNXB: "",
+        NamXB: "",
         DonGia: "",
         SoQuyen: "",
       };
@@ -259,6 +272,7 @@ export default {
         TenSach: book.TenSach,
         TacGia: book.TacGia,
         MaNXB: book.MaNXB?._id || "",
+        NamXB: book.NamXB,
         DonGia: book.DonGia,
         SoQuyen: book.SoQuyen,
       };
@@ -271,6 +285,7 @@ export default {
       try {
         const bookData = {
           ...this.formData,
+          NamXB: Number(this.formData.NamXB),
           DonGia: Number(this.formData.DonGia),
           SoQuyen: Number(this.formData.SoQuyen),
         };

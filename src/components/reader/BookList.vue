@@ -27,6 +27,7 @@
             <p class="card-text">
               Nhà xuất bản: {{ book.MaNXB?.TenNXB || "Không xác định" }}
             </p>
+            <p class="card-text">Năm xuất bản: {{ book.NamXB }}</p>
             <p class="card-text">Đơn giá: {{ formatCurrency(book.DonGia) }}</p>
             <p class="card-text">Số quyển: {{ book.SoQuyen }}</p>
             <p class="card-text">
