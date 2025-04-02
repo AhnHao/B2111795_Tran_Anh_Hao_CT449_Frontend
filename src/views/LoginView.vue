@@ -1,90 +1,122 @@
 <template>
   <div class="login-container">
-    <div class="card login-card">
-      <div class="card-header text-center">
-        <h3>Đăng nhập</h3>
-      </div>
-      <div class="card-body">
-        <form @submit.prevent="handleLogin">
-          <div class="mb-3">
-            <label for="phone" class="form-label">Số điện thoại</label>
-            <input
-              type="text"
-              class="form-control"
-              id="phone"
-              v-model="formData.SoDienThoai"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Mật khẩu</label>
-            <input
-              type="password"
-              class="form-control"
-              id="password"
-              v-model="formData.Password"
-              required
-            />
-          </div>
-          <div class="alert alert-danger" v-if="error">
-            {{ error }}
-          </div>
-          <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary" :disabled="loading">
-              {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
-            </button>
-          </div>
-          <div class="text-center mt-3">
+    <div class="form-container">
+      <div class="card login-card fade-in">
+        <div class="card-header text-center">
+          <i class="bi bi-book-half header-icon"></i>
+          <h3>Chào mừng trở lại!</h3>
+          <p class="text-muted">Đăng nhập vào tài khoản của bạn</p>
+        </div>
+        <div class="card-body">
+          <form @submit.prevent="handleLogin">
+            <div class="form-floating mb-4">
+              <input
+                type="text"
+                class="form-control"
+                id="phone"
+                v-model="formData.SoDienThoai"
+                placeholder="Số điện thoại"
+                required
+              />
+              <label for="phone">
+                <i class="bi bi-phone me-2"></i>Số điện thoại
+              </label>
+            </div>
+            <div class="form-floating mb-4">
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                v-model="formData.Password"
+                placeholder="Mật khẩu"
+                required
+              />
+              <label for="password">
+                <i class="bi bi-lock me-2"></i>Mật khẩu
+              </label>
+            </div>
+            <div class="d-grid gap-2">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                :disabled="loading"
+              >
+                <span
+                  v-if="loading"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
+                {{ loading ? "Đang đăng nhập..." : "Đăng nhập" }}
+              </button>
+            </div>
+          </form>
+          <div class="text-center mt-4">
             <p class="mb-0">
               Chưa có tài khoản?
-              <router-link to="/register">Đăng ký ngay</router-link>
+              <router-link to="/register" class="text-decoration-none fw-bold">
+                Đăng ký ngay<i class="bi bi-arrow-right ms-1"></i>
+              </router-link>
             </p>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import api from '../services/api';
+import api from "../services/api";
 
 export default {
-  name: 'LoginView',
+  name: "LoginView",
   data() {
     return {
       formData: {
-        SoDienThoai: '',
-        Password: ''
+        SoDienThoai: "",
+        Password: "",
       },
       loading: false,
-      error: null
     };
   },
   methods: {
     async handleLogin() {
+      if (this.loading) return;
+
       this.loading = true;
-      this.error = null;
       try {
         const response = await api.login(this.formData);
-        const { token, role, user } = response.data;
-        
-        localStorage.setItem('token', token);
-        localStorage.setItem('userRole', role);
-        localStorage.setItem('userData', JSON.stringify(user));
 
-        if (role === 'staff') {
-          this.$router.push('/staff');
-        } else {
-          this.$router.push('/reader');
-        }
+        // Lưu thông tin đăng nhập
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("userRole", response.data.role);
+        localStorage.setItem("userData", JSON.stringify(response.data.user));
+
+        // Hiển thị thông báo thành công
+        this.$notify({
+          type: "success",
+          title: "Đăng nhập thành công",
+          message: "Chào mừng bạn quay trở lại!",
+        });
+
+        // Chuyển hướng sau khi thông báo được hiển thị
+        setTimeout(() => {
+          this.$router.push(
+            response.data.role === "staff" ? "/staff" : "/reader"
+          );
+        }, 500);
       } catch (error) {
-        this.error = error.response?.data?.message || 'Đã có lỗi xảy ra';
+        // Hiển thị thông báo lỗi
+        this.$notify({
+          type: "error",
+          title: "Đăng nhập thất bại",
+          message:
+            error.response?.data?.message ||
+            "Thông tin đăng nhập không chính xác",
+        });
       } finally {
         this.loading = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -94,56 +126,93 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8f9fa;
-  padding: 15px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  padding: 20px;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 450px;
+  perspective: 1000px;
 }
 
 .login-card {
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: none;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.login-card:hover {
+  transform: translateY(-5px) rotateX(5deg);
 }
 
 .card-header {
-  background-color: #fff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-  padding: 1.5rem;
+  background: transparent;
+  padding: 2.5rem 2rem 1.5rem;
+  border: none;
+}
+
+.header-icon {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
 }
 
 .card-header h3 {
-  margin: 0;
-  color: #333;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
 }
 
 .card-body {
   padding: 2rem;
 }
 
-.form-label {
-  font-weight: 500;
-  color: #555;
+.form-floating > label {
+  color: #6b7280;
 }
 
 .form-control {
-  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  padding: 1rem;
+  height: 3.5rem;
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
 .btn-primary {
-  padding: 0.75rem;
-  font-weight: 500;
+  background: linear-gradient(to right, var(--primary-color), #8b5cf6);
+  border: none;
+  font-weight: 600;
+  padding: 1rem;
+  transition: all 0.3s ease;
 }
 
-.alert {
-  margin-bottom: 1rem;
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
 }
 
 @media (max-width: 576px) {
-  .login-card {
-    margin: 15px;
-  }
-  
   .card-body {
     padding: 1.5rem;
+  }
+
+  .header-icon {
+    font-size: 2rem;
+  }
+
+  .card-header h3 {
+    font-size: 1.5rem;
   }
 }
 </style>
