@@ -505,18 +505,18 @@ export default {
 }
 
 /* Modal styles */
-::v-deep .modal-content {
+:deep(.modal-conten)t {
   border-radius: 1rem;
   border: none;
 }
 
-::v-deep .modal-header {
+:deep(.modal-header) {
   background-color: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
   padding: 1.5rem;
 }
 
-::v-deep .modal-body {
+:deep(.modal-body) {
   padding: 1.5rem;
 }
 
